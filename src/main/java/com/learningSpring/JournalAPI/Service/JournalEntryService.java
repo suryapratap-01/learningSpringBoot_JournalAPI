@@ -6,22 +6,42 @@ import java.util.Optional;
 
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.learningSpring.JournalAPI.Entity.JournalEntry;
+import com.learningSpring.JournalAPI.Entity.User;
 import com.learningSpring.JournalAPI.Repository.JournalEntryRepository;
+
+@Component
 public class JournalEntryService {
 
     @Autowired
     private JournalEntryRepository journalEntryRepository;
 
-    public JournalEntry saveEntry(JournalEntry journalEntry) {
+    @Autowired
+    private UserService userService;
+
+    @Transactional
+    public JournalEntry saveEntry(JournalEntry journalEntry, String username) {
         try {
+            User existingUser = userService.getUserByUsername(username);
             journalEntry.setDate(LocalDateTime.now());
-            journalEntryRepository.save(journalEntry);
+            JournalEntry savedEntry =  journalEntryRepository.save(journalEntry);
+            existingUser.getJournalEntries().add(savedEntry);
+            userService.saveEntry(existingUser);
         } catch (Exception e) {
             throw new RuntimeException("Error saving journal entry: " + e.getMessage());
         }
         return journalEntry;
+    }
+
+    public void saveEntry(JournalEntry journalEntry) {
+        try {
+            journalEntryRepository.save(journalEntry);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving journal entry: " + e.getMessage());
+        }
     }
 
     public List<JournalEntry> getAllEntries() {
@@ -32,13 +52,19 @@ public class JournalEntryService {
         return journalEntryRepository.findById(id);
     }
 
-    public boolean deleteEntry(ObjectId id) {
+    public void deleteEntry(ObjectId id, String username) {
         try {
+            User existingUser = userService.getUserByUsername(username);
+            List<JournalEntry> journalEntries = existingUser.getJournalEntries();
+            if (journalEntries != null && !journalEntries.isEmpty()) {
+                journalEntries.removeIf(entry -> entry.getId().equals(id));
+                existingUser.setJournalEntries(journalEntries);
+                userService.saveEntry(existingUser);
+            }
             journalEntryRepository.deleteById(id);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting journal entry: " + e.getMessage());
         }
-        return false;
     }
     
     public Optional<JournalEntry> updateEntry(ObjectId id, JournalEntry journalEntry) {
