@@ -35,7 +35,7 @@ public class UserController {
 
     @DeleteMapping("/delete")
     public void deleteUser(@RequestBody User user) {
-        userService.deleteUser(user.getUsername());
+        userService.deleteUser(user.getUserName());
     }
     
     @PutMapping("/update/{username}")
@@ -45,7 +45,7 @@ public class UserController {
             if (userInDb == null) {
                 return ResponseEntity.status(404).body("User not found");
             } else {
-                userInDb.setUsername(user.getUsername());
+                userInDb.setUserName(user.getUserName());
                 userInDb.setPassword(user.getPassword());
                 userService.saveEntry(userInDb);
                 return ResponseEntity.ok(userInDb);

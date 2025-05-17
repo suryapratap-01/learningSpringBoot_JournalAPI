@@ -27,12 +27,12 @@ public class UserService {
     }
 
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUserName(username);
     }
 
     public boolean deleteUser(String username) {
         try {
-            userRepository.deleteByUsername(username);
+            userRepository.deleteByUserName(username);
         } catch (Exception e) {
             throw new RuntimeException("Error deleting user: " + e.getMessage());
         }
