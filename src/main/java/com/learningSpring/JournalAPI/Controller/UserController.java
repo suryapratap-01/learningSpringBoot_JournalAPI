@@ -27,15 +27,30 @@ public class UserController {
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
+
+    @GetMapping("/{username}")
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
+        User user = userService.getUserByUsername(username);
+        if (user != null) {
+            return ResponseEntity.ok(user);
+        } else {
+            return ResponseEntity.status(404).body("No such user exists");
+        }
+    }
     
     @PostMapping("/create")
     public void createUser(@RequestBody User user) {
         userService.saveEntry(user);
     }
 
-    @DeleteMapping("/delete")
-    public void deleteUser(@RequestBody User user) {
-        userService.deleteUser(user.getUserName());
+    @DeleteMapping("/delete/{username}")
+    public ResponseEntity<?> deleteUser(@PathVariable String username) {
+        boolean deleted = userService.deleteUser(username);
+        if (deleted) {
+            return ResponseEntity.ok("User deleted successfully");
+        } else {
+            return ResponseEntity.status(404).body("No such user exists");
+        }
     }
     
     @PutMapping("/update/{username}")

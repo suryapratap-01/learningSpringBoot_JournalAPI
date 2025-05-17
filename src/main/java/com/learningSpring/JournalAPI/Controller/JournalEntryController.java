@@ -44,14 +44,14 @@ public class JournalEntryController {
         return new ResponseEntity<>(createdEntry, HttpStatus.CREATED);
     }
 
-    @GetMapping("/all/{userName}")
+    @GetMapping("/{userName}")
     public ResponseEntity<?> getAllJournalEntriesofUser(@PathVariable String userName) {
         User user = userService.getUserByUsername(userName);
         List<JournalEntry> journalEntries = user.getJournalEntries();
         if (journalEntries != null && !journalEntries.isEmpty()) {
             return new ResponseEntity<>(journalEntries, HttpStatus.OK);
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return new ResponseEntity<>("No journal entries found for user.", HttpStatus.OK);
         }
     }
 
@@ -74,7 +74,7 @@ public class JournalEntryController {
     @PutMapping("/update/{userName}/{myid}")
     public ResponseEntity<?> updateJournalEntry(@PathVariable String userName, @PathVariable ObjectId myid, @RequestBody JournalEntry journalEntry) {
         Optional<JournalEntry> updatedEntry = journalEntryService.updateEntry(myid, journalEntry);
-        if (updatedEntry.isPresent()) {
+        if (updatedEntry != null && updatedEntry.isPresent()) {
             return new ResponseEntity<>(updatedEntry.get(), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

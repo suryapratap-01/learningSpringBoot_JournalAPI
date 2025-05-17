@@ -73,11 +73,11 @@ public class JournalEntryService {
                     .orElseThrow(() -> new RuntimeException("Journal entry not found"));
             existingEntry.setTitle(journalEntry.getTitle());
             existingEntry.setContent(journalEntry.getContent());
-            journalEntryRepository.save(existingEntry);
+            JournalEntry savedEntry = journalEntryRepository.save(existingEntry);
+            return Optional.of(savedEntry);
         } catch (Exception e) {
-            throw new RuntimeException("Error updating journal entry: " + e.getMessage());
+            return Optional.empty();
         }
-        return null;
     }
 
 }

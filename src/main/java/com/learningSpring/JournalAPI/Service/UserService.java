@@ -31,12 +31,13 @@ public class UserService {
     }
 
     public boolean deleteUser(String username) {
-        try {
-            userRepository.deleteByUserName(username);
-        } catch (Exception e) {
-            throw new RuntimeException("Error deleting user: " + e.getMessage());
+        User user = userRepository.findByUserName(username);
+        if (user != null) {
+            userRepository.delete(user);
+            return true;
+        } else {
+            return false;
         }
-        return false;
     }
 
     public void findByUserName(String userName) {
