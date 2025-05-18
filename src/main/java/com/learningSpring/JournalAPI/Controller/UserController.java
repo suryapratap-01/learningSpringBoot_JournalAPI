@@ -23,7 +23,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @GetMapping("/all")
+    @GetMapping("/")
     public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
@@ -38,12 +38,12 @@ public class UserController {
         }
     }
     
-    @PostMapping("/create")
+    @PostMapping("/")
     public void createUser(@RequestBody User user) {
         userService.saveEntry(user);
     }
 
-    @DeleteMapping("/delete/{username}")
+    @DeleteMapping("/{username}")
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
         boolean deleted = userService.deleteUser(username);
         if (deleted) {
@@ -53,7 +53,7 @@ public class UserController {
         }
     }
     
-    @PutMapping("/update/{username}")
+    @PutMapping("/{username}")
     public ResponseEntity<?> updateUser(@RequestBody User user, @PathVariable String username) {
         try {
             User userInDb = userService.getUserByUsername(username);
